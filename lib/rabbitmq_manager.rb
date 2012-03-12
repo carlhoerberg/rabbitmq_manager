@@ -10,6 +10,7 @@ class RabbitMQManager
       'Content-Type' => 'application/json'
     }
     @conn = Faraday.new(:url => url, :headers => headers) do |builder|
+      #builder.use Faraday::Response::Logger
       builder.use Faraday::Response::RaiseError
       builder.use FaradayMiddleware::EncodeJson
       builder.use FaradayMiddleware::ParseJson, :content_type => /\bjson$/
@@ -18,54 +19,71 @@ class RabbitMQManager
   end
 
   def overview
-    @conn.get('/api/overview').body
+    @conn.get(url :overview).body
+  end
+
+  def queues(vhost = '')
+    @conn.get(url :queues, vhost).body
+  end
+
+  def queue(vhost, name)
+    @conn.get(url :queues, vhost, name).body
+  end
+
+  def queue_create(vhost, name, durable = false, auto_delete = false, args = {})
+    opts = { durable: durable, auto_delete: auto_delete, arguments: args }
+    @conn.put(url(:queues, vhost, name), opts).body
+  end
+
+  def queue_delete(vhost, name)
+    @conn.delete(url :queues, vhost, name).body
   end
 
   def nodes
-    @conn.get('/api/nodes').body
+    @conn.get(url :nodes).body
   end
 
   def node(name)
-    @conn.get("/api/nodes/#{URI.escape name}").body
+    @conn.get(url :nodes, name).body
   end
 
   def vhosts
-    @conn.get('/api/vhosts').body
+    @conn.get(url :vhosts).body
   end
 
   def vhost(name)
-    @conn.get("/api/vhosts/#{URI.escape name}").body
+    @conn.get(url :vhosts, name).body
   end
 
   def vhost_create(name)
-    @conn.put("/api/vhosts/#{URI.escape name}").body
+    @conn.put(url :vhosts, name).body
   end
 
   def vhost_delete(name)
-    @conn.delete("/api/vhosts/#{URI.escape name}").body
+    @conn.delete(url :vhosts, name).body
   end
 
   def users
-    @conn.get('/api/users').body
+    @conn.get(url :users).body
   end
 
   def user(name)
-    @conn.get("/api/users/#{URI.escape name}").body
+    @conn.get(url :users, name).body
   end
 
   def user_create(name, password, tags = '')
-    @conn.put("/api/users/#{URI.escape name}", {
+    @conn.put(url(:users, name), {
       :password => password, 
       :tags => tags 
     }).body
   end
 
   def user_delete(name)
-    @conn.delete("/api/users/#{URI.escape name}").body
+    @conn.delete(url :users, name).body
   end
 
   def user_set_permissions(name, vhost, configure, write, read)
-    @conn.put("/api/permissions/#{URI.escape vhost}/#{URI.escape name}", {
+    @conn.put(url(:permissions, vhost, name), {
       :configure => configure,
       :write => write, 
       :read => read
@@ -73,6 +91,11 @@ class RabbitMQManager
   end
 
   def user_permissions(name)
-    @conn.get("/api/users/#{URI.escape name}/permissions").body
+    @conn.get(url :users, name, :permissions).body
+  end
+
+  private
+  def url(*args)
+    '/api/' + args.map{ |a| URI.encode_www_form_component a.to_s }.join('/')
   end
 end

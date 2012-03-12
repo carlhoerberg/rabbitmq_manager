@@ -15,6 +15,25 @@ describe RabbitMQManager do
     it { should have(1).things }
   end
 
+  context '#queues' do
+    subject { manager.queues }
+    it { should be_instance_of Array }
+  end
+
+  context '#queues(vhost)' do
+    subject { manager.queues('/') }
+    it { should be_instance_of Array }
+  end
+
+  context '#queue' do
+    let(:queue) { 'q1' }
+    before { manager.queue_create('/', queue) }
+    subject { manager.queue('/', queue) }
+    it { should be_instance_of Hash }
+    it { subject['name'].should == queue }
+    after { manager.queue_delete('/', queue) }
+  end
+
   context '#node' do
     let(:hostname) { `hostname -s`.chop }
     subject { manager.node("rabbit@#{hostname}") }
