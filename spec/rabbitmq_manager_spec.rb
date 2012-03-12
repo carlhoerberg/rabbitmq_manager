@@ -1,3 +1,4 @@
+require './spec/spec_helper'
 require './lib/rabbitmq_manager'
 
 describe RabbitMQManager do
