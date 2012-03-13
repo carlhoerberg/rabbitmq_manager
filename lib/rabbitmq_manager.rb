@@ -4,13 +4,16 @@ require 'faraday_middleware'
 require 'uri'
 
 class RabbitMQManager
-  def initialize(url)
-    headers = { 
-      'accept' => 'application/json',
-      'Content-Type' => 'application/json'
+  def initialize(url, ssl_options = nil)
+    opts = {
+      :headers => { 
+        'accept' => 'application/json',
+        'Content-Type' => 'application/json'
+      },
+      :ssl => ssl_options
     }
-    @conn = Faraday.new(:url => url, :headers => headers) do |builder|
-      #builder.use Faraday::Response::Logger
+
+    @conn = Faraday::Connection.new(url, opts) do |builder|
       builder.use Faraday::Response::RaiseError
       builder.use FaradayMiddleware::EncodeJson
       builder.use FaradayMiddleware::ParseJson, :content_type => /\bjson$/
