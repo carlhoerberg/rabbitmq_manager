@@ -78,15 +78,16 @@ describe RabbitMQManager do
       }.should raise_error Faraday::Error::ResourceNotFound
     end
 
-    it 'can set permissions' do 
-      manager.user_set_permissions(user, vhost, '.*', '.*', '.*')
-      manager.user_permissions(user).should == [{
-        "user"=>"user1",
-        "vhost"=>"vh1",
-        "configure"=>".*",
-        "write"=>".*",
-        "read"=>".*"
-      }]
+    context 'permissions' do
+      before  { manager.user_set_permissions(user, vhost, '.*', '.*', '.*') }
+      subject { manager.user_permissions(user) }
+      it { subject.should be_instance_of Array }
+      context 'for first element' do
+        subject { manager.user_permissions(user).first }
+        it('has name') { subject['user'] == user }
+        it('has read permissions') { subject['read'] == '.*' }
+        it('has write permissions') { subject['write'] == '.*' }
+      end
     end
   end
 end
