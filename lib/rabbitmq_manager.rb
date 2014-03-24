@@ -29,6 +29,10 @@ class RabbitMQManager
     @conn.get(url :connections).body
   end
 
+  def channels
+    @conn.get(url :channels).body
+  end
+
   def queues(vhost = '')
     @conn.get(url :queues, vhost).body
   end

@@ -16,6 +16,11 @@ describe RabbitMQManager do
     it { should have_at_least(1).things }
   end
 
+  context '#channels' do
+    subject { manager.channels }
+    it { should have_at_least(1).things }
+  end
+
   context '#nodes' do 
     subject { manager.nodes }
     it { should have(1).things }
