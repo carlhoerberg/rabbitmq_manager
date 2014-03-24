@@ -11,6 +11,11 @@ describe RabbitMQManager do
     it { should be_instance_of Hash }
   end
 
+  context '#connections' do
+    subject { manager.connections }
+    it { should have_at_least(1).things }
+  end
+
   context '#nodes' do 
     subject { manager.nodes }
     it { should have(1).things }
@@ -36,7 +41,7 @@ describe RabbitMQManager do
   end
 
   context '#node' do
-    let(:hostname) { `hostname -s`.chop }
+    let(:hostname) { `hostname`.chop }
     subject { manager.node("rabbit@#{hostname}") }
     it { should be_instance_of Hash }
   end
