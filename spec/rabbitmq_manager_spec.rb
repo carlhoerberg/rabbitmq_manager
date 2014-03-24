@@ -3,7 +3,7 @@ require './lib/rabbitmq_manager'
 
 describe RabbitMQManager do
   let(:manager) { 
-    RabbitMQManager.new 'http://guest:guest@localhost:55672' 
+    RabbitMQManager.new 'http://guest:guest@localhost:15672'
   }
 
   context '#overview' do

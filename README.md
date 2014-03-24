@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-    rmq = RabbitMQManager.new 'http://guest:guest@localhost:55672' 
+    rmq = RabbitMQManager.new 'http://guest:guest@localhost:15672'
     rmq.overview #=> cluster overview
 
     rmq.nodes #=> array of nodes
