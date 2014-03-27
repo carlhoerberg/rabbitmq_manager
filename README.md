@@ -1,8 +1,8 @@
 # RabbitMQ Manager
 
-A wrapper for RabbitMQs management HTTP API. 
+A wrapper for RabbitMQs management HTTP API.
 
-[More information on the API](http://hg.rabbitmq.com/rabbitmq-management/raw-file/rabbitmq_v2_7_1/priv/www/api/index.html)
+[More information on the API](http://hg.rabbitmq.com/rabbitmq-management/raw-file/rabbitmq_v3_2_4/priv/www/api/index.html)
 
 ## Installation
 
@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-    rmq = RabbitMQManager.new 'http://guest:guest@localhost:55672' 
+    rmq = RabbitMQManager.new 'http://guest:guest@localhost:15672'
     rmq.overview #=> cluster overview
 
     rmq.nodes #=> array of nodes

@@ -6,7 +6,7 @@ require 'uri'
 class RabbitMQManager
   def initialize(url, ssl_options = nil)
     opts = {
-      :headers => { 
+      :headers => {
         'accept' => 'application/json',
         'Content-Type' => 'application/json'
       },
@@ -23,6 +23,14 @@ class RabbitMQManager
 
   def overview
     @conn.get(url :overview).body
+  end
+
+  def connections
+    @conn.get(url :connections).body
+  end
+
+  def channels
+    @conn.get(url :channels).body
   end
 
   def queues(vhost = '')
@@ -76,8 +84,8 @@ class RabbitMQManager
 
   def user_create(name, password, tags = '')
     @conn.put(url(:users, name), {
-      :password => password, 
-      :tags => tags 
+      :password => password,
+      :tags => tags
     }).body
   end
 
@@ -88,7 +96,7 @@ class RabbitMQManager
   def user_set_permissions(name, vhost, configure, write, read)
     @conn.put(url(:permissions, vhost, name), {
       :configure => configure,
-      :write => write, 
+      :write => write,
       :read => read
     }).body
   end

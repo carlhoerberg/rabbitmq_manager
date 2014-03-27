@@ -3,12 +3,22 @@ require './lib/rabbitmq_manager'
 
 describe RabbitMQManager do
   let(:manager) { 
-    RabbitMQManager.new 'http://guest:guest@localhost:55672' 
+    RabbitMQManager.new 'http://guest:guest@localhost:15672'
   }
 
   context '#overview' do
     subject { manager.overview }
     it { should be_instance_of Hash }
+  end
+
+  context '#connections' do
+    subject { manager.connections }
+    it { should have_at_least(1).things }
+  end
+
+  context '#channels' do
+    subject { manager.channels }
+    it { should have_at_least(1).things }
   end
 
   context '#nodes' do 
@@ -36,7 +46,7 @@ describe RabbitMQManager do
   end
 
   context '#node' do
-    let(:hostname) { `hostname -s`.chop }
+    let(:hostname) { `hostname`.chop }
     subject { manager.node("rabbit@#{hostname}") }
     it { should be_instance_of Hash }
   end
