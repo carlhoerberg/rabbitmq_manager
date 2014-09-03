@@ -130,4 +130,55 @@ RSpec.describe RabbitMQManager do
     end
 
   end
+
+  describe 'high availability policies can be administered' do
+    vhost = make_name 'rspec-vh'
+
+    before(:each) do
+      @manager.vhost_create(vhost)
+      @manager.user_set_permissions(@rspec_user, vhost, '.*', '.*', '.*')
+    end
+
+    after(:each) do
+      @manager.vhost_delete(vhost)
+    end
+
+    it 'initially a specific vhost has no policies, the Array is empty' do
+      policies = @manager.policies(vhost)
+      expect(policies).to be_an Array
+      expect(policies.length).to eq(0)
+    end
+
+    it 'Creating a basic policy requires a name, pattern and a definition' do
+      name = make_name 'rspec-policy'
+      @manager.policy_create(vhost, name, '^None', {'ha-mode'=>'all'})
+      policies = @manager.policies(vhost)
+      expect(policies.length).to eq(1)
+    end
+
+    it 'individual policies can be queried' do
+      name = make_name 'rspec-policy'
+      @manager.policy_create(vhost, name, '^None', {'ha-mode'=>'all'})
+      policy = @manager.policy_get(vhost, name)
+      
+      expect(policy['name']).to eq(name)
+    end
+
+    it 'individual policies can be deleted' do
+      name = make_name 'rspec-policy'
+
+      @manager.policy_create(vhost, name, '^None', {'ha-mode'=>'all'})
+      @manager.policy_delete(vhost, name)
+
+      expect(@manager.policies(vhost).length).to eq(0)
+    end
+
+    it 'queries on a non-existent policy throws and error' do
+      name = make_name 'rspec-policy'
+      expect {
+        @manager.policy_get(vhost, name)
+      }.to raise_error Faraday::Error::ResourceNotFound
+    end
+
+  end
 end
