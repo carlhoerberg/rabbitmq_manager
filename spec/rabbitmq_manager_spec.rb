@@ -1,60 +1,62 @@
 require './spec/spec_helper'
 require './lib/rabbitmq_manager'
 
-def create_manager
-  RabbitMQManager.new 'http://guest:guest@localhost:15672'
+def make_name(name_prefix)
+  name_prefix + '-' + rand(1000).to_s
 end
 
 RSpec.describe RabbitMQManager do
   before(:all) do
-    @manager = create_manager
+    @rspec_user = 'guest'
+    rspec_password = 'guest'
+    @manager = RabbitMQManager.new "http://#{@rspec_user}:#{rspec_password}@localhost:15672"
   end
 
-  it "the overview method provides a Hash" do
+  it 'the overview method provides a Hash' do
     expect(@manager.overview()).to be_a Hash
   end
 
-  it "there will be at least one connection" do
+  it 'there will be at least one connection' do
     items = @manager.connections()
     expect(items.length).to be >= 1
   end
 
-  it "there will be at least one channel" do
+  it 'there will be at least one channel' do
     items = @manager.channels()
     expect(items.length).to be >= 1
   end
 
-  describe "node discovery" do
-    it "there will be at least one node" do
+  describe 'node discovery' do
+    it 'there will be at least one node' do
       items = @manager.nodes()
       expect(items.length).to be >= 1
     end
-    it "" do
+    it 'the list of nodes is a Hash' do
         hostname = `hostname`.chop
         item = @manager.node("rabbit@#{hostname}")
         expect(item).to be_a Hash
     end
   end
 
-  it "all queues can be listed as an Array" do
+  it 'all queues can be listed as an Array' do
     items = @manager.queues()
     expect(items).to be_an Array
   end
 
-  it "queues can be listed per vhost as an Array" do
+  it 'queues can be listed per vhost as an Array' do
     items = @manager.queues('/')
     expect(items).to be_an Array
   end
 
-  describe "queue manipulation" do
-    queue = 'rspec-q1-' + rand(1000).to_s
+  describe 'queue manipulation' do
+    queue = make_name 'rspec-q1'
     vhost = '/'
 
     after(:all) do
       @manager.queue_delete(vhost, queue)
     end
 
-    it "queues can be created and removed" do
+    it 'queues can be created and removed' do
       @manager.queue_create(vhost, queue)
       items = @manager.queue(vhost, queue)
       expect(items).to be_a Hash
@@ -62,9 +64,9 @@ RSpec.describe RabbitMQManager do
     end
   end
 
-  describe "when administering users and vhosts" do
-    user = 'rspec-user-' + rand(1000).to_s
-    passwd = rand(1000).to_s
+  describe 'when administering users and vhosts' do
+    user = make_name 'rspec-user'
+    passwd = make_name ''
     vhost = 'rspec-vh'
 
     before(:all) do
@@ -77,7 +79,7 @@ RSpec.describe RabbitMQManager do
       @manager.vhost_delete vhost
     end
 
-    it "list vhosts" do
+    it 'list vhosts' do
       expect(@manager.vhosts.length).to be >= 2
     end
 
