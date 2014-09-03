@@ -33,6 +33,33 @@ class RabbitMQManager
     @conn.get(url :channels).body
   end
 
+  def policies(vhost = '')
+    @conn.get(url :policies, vhost).body
+  end
+
+  def policy_get(vhost, name)
+    @conn.get(url :policies, vhost, name).body
+  end
+
+  def policy_create(vhost, name, pattern, definition, opts = nil)
+    valid = ["ha-mode", "ha-params", "ha-sync-mode", "alternate-exchange", "dead-letter-exchange","dead-letter-routing-key", "message-ttl", "expires", "max-length", "federation-upstream-set"]
+    definition.keys.each { | key |
+      if !valid.include?(key)
+        raise "The definition key '#{key}' is not valid, try these #{valid}"
+      end
+    }
+    policy = {
+      pattern: pattern,
+      definition: definition
+    }.merge(opts || {})
+
+    @conn.put(url(:policies, vhost, name), policy).body
+  end
+
+  def policy_delete(vhost, name)
+    @conn.delete(url :policies, vhost, name).body
+  end
+
   def queues(vhost = '')
     @conn.get(url :queues, vhost).body
   end
